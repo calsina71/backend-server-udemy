@@ -9,7 +9,7 @@ var app = express();
 var Medico = require ('../models/medico');
 
 // ===========================================
-//         Obtener todos los hospitales
+//         Obtener todos los médicos
 // ===========================================
 app.get('/', ( req, res, next ) => {
 
@@ -36,7 +36,7 @@ app.get('/', ( req, res, next ) => {
 
                         res.status(200).json({
                             ok: true,
-                            medico: medicos,
+                            medicos: medicos,
                             total: conteo 
 
                         });
@@ -48,9 +48,47 @@ app.get('/', ( req, res, next ) => {
 
 });
 
+// ===========================================
+//         obtener un médico
+// ===========================================
+app.get('/:id', ( req, res ) => {
+
+    var id = req.params.id;
+
+    Medico.findById( id )
+    .populate( 'usuario', 'nombre email img')
+    .populate( 'hospital')
+    .exec( (err, medico ) => {
+
+        if ( err ) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar médico',
+                errors: err
+            });        
+        }
+
+        if ( !medico ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El médico con Id: ' + id + ' no existe',
+                errors: { message: 'No existe el médico con ese Id.'}
+            });   
+            
+        }
+
+        res.status(200).json({
+            ok: true,
+            medico: medico
+        });
+
+    });
+
+});
+
 
 // ===========================================
-//         Actualizar un hospital
+//         Actualizar un médico
 // ===========================================
 app.put( '/:id', mdAutenticacion.verificaToken, ( req, res ) => {
 
@@ -76,7 +114,7 @@ app.put( '/:id', mdAutenticacion.verificaToken, ( req, res ) => {
         }
 
         medico.nombre = body.nombre;
-        // hospital.img = body.img;
+        // médicos.img = body.img;
         medico.usuario = req.usuario._id;
         medico.hospital = body.hospital; 
 
@@ -101,7 +139,7 @@ app.put( '/:id', mdAutenticacion.verificaToken, ( req, res ) => {
 
 
 // ===========================================
-//         Crear un usuario
+//         Crear un médico
 // ===========================================
 app.post( '/', mdAutenticacion.verificaToken, ( req, res ) => {
 
@@ -138,7 +176,7 @@ app.post( '/', mdAutenticacion.verificaToken, ( req, res ) => {
 
 
 // ===========================================
-//             Eliminar un hospital
+//             Eliminar un médico
 // ===========================================
 app.delete( '/:id', mdAutenticacion.verificaToken, ( req, res ) => {
 
