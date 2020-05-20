@@ -3,7 +3,9 @@ var express = require ('express');
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 
+// Middlewares
 var mdAutenticacion = require('../middlewares/autenticacion');
+
 // var SEED = require('../config/config').SEED;
 
 var app = express();
@@ -51,7 +53,7 @@ app.get('/', ( req, res, next ) => {
 // ===========================================
 //         Actualizar un usuario
 // ===========================================
-app.put( '/:id', mdAutenticacion.verificaToken, ( req, res ) => {
+app.put( '/:id', [ mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE_o_PropioUsuario ], ( req, res ) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -141,7 +143,7 @@ app.post( '/', ( req, res ) => {
 // ===========================================
 //             Eliminar un usuario
 // ===========================================
-app.delete( '/:id', mdAutenticacion.verificaToken, ( req, res ) => {
+app.delete( '/:id', [ mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE_o_PropioUsuario ], ( req, res ) => {
 
     var id = req.params.id;
     
